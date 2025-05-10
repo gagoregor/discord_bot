@@ -1,0 +1,45 @@
+
+---
+
+## **💻 Основной код**  
+
+### **1. Главный файл (`src/index.js`)**  
+```javascript
+const { Client, IntentsBitField } = require('discord.js');
+const config = require('../config.json');
+const db = require('./db/database');
+
+const client = new Client({
+  intents: [
+    IntentsBitField.Flags.Guilds,
+    IntentsBitField.Flags.GuildMessages,
+    IntentsBitField.Flags.MessageContent,
+    IntentsBitField.Flags.GuildMembers,
+  ],
+});
+
+// Загрузка команд
+client.commands = new Map();
+const fs = require('fs');
+const commandFiles = fs.readdirSync('./src/commands').filter(file => file.endsWith('.js'));
+
+for (const file of commandFiles) {
+  const command = require(`./commands/${file}`);
+  client.commands.set(command.name, command);
+}
+
+// Загрузка событий
+const eventFiles = fs.readdirSync('./src/events').filter(file => file.endsWith('.js'));
+for (const file of eventFiles) {
+  const event = require(`./events/${file}`);
+  if (event.once) {
+    client.once(event.name, (...args) => event.execute(...args, client));
+  } else {
+    client.on(event.name, (...args) => event.execute(...args, client));
+  }
+}
+
+// Подключение к БД
+db.connect(config.mysql);
+
+client.login(config.token);
