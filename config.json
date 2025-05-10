@@ -1,4 +1,10 @@
 {
-  "token": "YOUR_DISCORD_TOKEN",
-  "prefix": "!"
+  "token": "ВАШ_DISCORD_ТОКЕН",
+  "prefix": "!",
+  "mysql": {
+    "host": "localhost",
+    "user": "root",
+    "password": "",
+    "database": "discord_bot"
+  }
 }
